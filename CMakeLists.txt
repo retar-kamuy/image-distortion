@@ -1,12 +1,13 @@
 cmake_minimum_required(VERSION 3.14)
 
-set(CMAKE_C_COMPILER clang)
-set(CMAKE_CPP_COMPILER clang++)
+set(CMAKE_C_COMPILER /usr/bin/clang)
+set(CMAKE_CXX_COMPILER /usr/bin/clang++)
 
 project(image-distortion)
 
 add_executable(image-distortion
     src/main.cpp
+    src/image.cpp
 )
 
 target_compile_features(image-distortion
@@ -21,7 +22,20 @@ target_include_directories(image-distortion
         ${PROJECT_SOURCE_DIR}/include
 )
 
+find_package(OpenCV REQUIRED)
 find_package(PythonLibs REQUIRED)
+
+if(OpenCV_FOUND)
+    target_include_directories(image-distortion
+        PRIVATE
+            ${OpenCV_INCLUDE_DIRS}
+    )
+
+    target_link_libraries(image-distortion
+        ${OpenCV_LIBS}
+    )
+
+endif(OpenCV_FOUND)
 
 if(PythonLibs_FOUND)
     target_include_directories(image-distortion
