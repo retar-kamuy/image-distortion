@@ -51,6 +51,8 @@ cv::Mat DistortionModel::distortion(cv::Mat img) {
             dst.set_pixel(j, i, distortion_pixel);
         }
     }
+    dst.resize(1.0 / max_distortion_x, 1.0 / max_distortion_y);
+
     return dst.get_img();
 }
 
