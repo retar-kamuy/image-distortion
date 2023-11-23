@@ -8,6 +8,7 @@ project(image-distortion)
 add_executable(image-distortion
     src/main.cpp
     src/image.cpp
+    src/distortion_model.cpp
 )
 
 target_compile_features(image-distortion

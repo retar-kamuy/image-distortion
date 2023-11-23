@@ -12,6 +12,7 @@
           "-g",
           "-std=c++17",
           "${file}",
+          "-Iinclude",
           "-I/usr/include/python3.6m",
           "-I/usr/local/lib64/python3.6/site-packages/numpy/core/include",
           "-lpython3.6m",
