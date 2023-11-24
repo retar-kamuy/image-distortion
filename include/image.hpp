@@ -7,6 +7,8 @@
 
 void imwrite(const std::string &filepath, const cv::Mat img);
 
+cv::Vec3b get_pixel(int x, int y, const cv::Mat img);
+
 class Image {
  private:
     cv::Mat img;

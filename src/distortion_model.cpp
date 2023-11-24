@@ -4,20 +4,22 @@
 float DistortionModel::distortion_x(float x, float y) {
     float pow_x = std::pow(x, 2.0);
     float pow_y = std::pow(y, 2.0);
+    float pow_r = pow_x + pow_y;
 
     return this->p_2 * (3.0 * pow_x + pow_y)
-        + x * (this->k_2 * (pow_x + pow_y) * (pow_x + pow_y)
-        + this->k_1 * (pow_x + pow_y) + 1.0)
+        + x * (this->k_2 * pow_r * pow_r
+        + this->k_1 * pow_r + 1.0)
         + 2.0 * this->p_1 * x * y;
 }
 
 float DistortionModel::distortion_y(float x, float y) {
     float pow_x = std::pow(x, 2.0);
     float pow_y = std::pow(y, 2.0);
+    float pow_r = pow_x + pow_y;
 
     return this->p_1 * (pow_x + 3.0 * pow_y)
-        + y * (this->k_2 * (pow_x + pow_y) * (pow_x + pow_y)
-        + this->k_1 * (pow_x + pow_y) + 1.0)
+        + y * (this->k_2 * pow_r * pow_r
+        + this->k_1 * pow_r + 1.0)
         + 2.0 * this->p_2 * x * y;
 }
 
@@ -27,7 +29,7 @@ cv::Mat DistortionModel::distortion(cv::Mat img) {
 
     double max_distortion_x = this->distortion_x(1.0, 1.0);
     double max_distortion_y = this->distortion_y(1.0, 1.0);
-    resized_img.resize(max_distortion_x, max_distortion_y);
+    // resized_img.resize(max_distortion_x, max_distortion_y);
 
     float offset_x = static_cast<float>(img.cols) / 2.0;
     float offset_y = static_cast<float>(img.rows) / 2.0;
@@ -39,20 +41,20 @@ cv::Mat DistortionModel::distortion(cv::Mat img) {
             float d_x = this->distortion_x(x, y);
             float d_y = this->distortion_y(x, y);
 
-            float re_ofst_x = static_cast<float>(resized_img.cols) / 2.0;
-            float re_ofst_y = static_cast<float>(resized_img.rows) / 2.0;
-
             int d_i = static_cast<int>(d_y * offset_y)
-                    + static_cast<int>(re_ofst_y);
+                    + static_cast<int>(offset_y);
             int d_j = static_cast<int>(d_x * offset_x)
-                    + static_cast<int>(re_ofst_x);
+                    + static_cast<int>(offset_x);
 
-            cv::Vec3b distortion_pixel = resized_img.get_pixel(d_j, d_i);
-            dst.set_pixel(j, i, distortion_pixel);
+            if (d_i > -1 && d_j > -1 && d_j < img.cols && d_i < img.rows) {
+                cv::Vec3b distortion_pixel = get_pixel(d_j, d_i, img);
+                dst.set_pixel(j, i, distortion_pixel);
+            } else {
+                dst.set_pixel(j, i, cv::Vec3b(255, 255, 255));
+            }
         }
     }
-    dst.resize(1.0 / max_distortion_x, 1.0 / max_distortion_y);
-
+    // dst.resize(1.0 / max_distortion_x, 1.0 / max_distortion_y);
     return dst.get_img();
 }
 

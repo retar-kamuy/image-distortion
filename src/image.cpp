@@ -14,6 +14,11 @@ void imwrite(const std::string &filepath, const cv::Mat img) {
               << std::endl;
 }
 
+cv::Vec3b get_pixel(int x, int y, const cv::Mat img) {
+    cv::Mat3b ptImg = img;
+    return ptImg(cv::Point(x, y));
+}
+
 void Image::matToUChar(const cv::Mat &src, unsigned char *dst) {
     for (int col = 0; col < src.cols; col++) {
         for (int row = 0; row < src.rows; row++) {
