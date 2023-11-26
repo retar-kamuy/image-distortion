@@ -26,7 +26,7 @@ int main(void) {
     InverseDistortion inv(k_1);
     // inv.plot(0.2);
 
-    cv::Mat dst = inv.inverse_distortion(img.get_img());
+    cv::Mat dst = inv.inverse_distortion_image(img.get_img());
 
     imwrite("Lenna_output.png", dst);
 

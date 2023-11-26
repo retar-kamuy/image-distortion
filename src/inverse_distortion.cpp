@@ -54,7 +54,7 @@ void InverseDistortion::inverse_distortion(
     }
 }
 
-cv::Mat InverseDistortion::inverse_distortion(cv::Mat img) {
+cv::Mat InverseDistortion::inverse_distortion_image(cv::Mat img) {
     Image dst(img);
 
     float offset_x = static_cast<float>(img.cols) / 2.0;

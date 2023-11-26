@@ -30,7 +30,7 @@ class InverseDistortion {
     float sigma_2(float x, float y);
     void inverse_distortion(
         float x, float y, float *u_x, float *u_y);
-    cv::Mat inverse_distortion(cv::Mat img);
+    cv::Mat inverse_distortion_image(cv::Mat img);
     void plot(float spacing);
 };
 
