@@ -17,14 +17,18 @@ int main(void) {
     // DistortionModel mdl(k_1, k_2, p_1, p_2);
     // mdl.plot(0.2);
 
-    // Image img(filepath);
+    Image img(filepath);
 
     // cv::Mat dst = mdl.distortion(img.get_img());
 
     // imwrite("Lenna_output.png", dst);
 
     InverseDistortion inv(k_1);
-    inv.plot(0.2);
+    // inv.plot(0.2);
+
+    cv::Mat dst = inv.inverse_distortion(img.get_img());
+
+    imwrite("Lenna_output.png", dst);
 
     return 0;
 }

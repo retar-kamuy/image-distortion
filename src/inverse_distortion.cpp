@@ -39,6 +39,21 @@ float InverseDistortion::sigma_2(float x, float y) {
     return s_2;
 }
 
+void InverseDistortion::inverse_distortion(
+    float x, float y, float *u_x, float *u_y
+) {
+    if (fabs(x) <= FLT_EPSILON && fabs(y) <= FLT_EPSILON) {
+        *u_x = 0.0;
+        *u_y = 0.0;
+    } else if (fabs(y) <= FLT_EPSILON) {
+        *u_x = this->sigma_1(y, x);
+        *u_y = 0.0;
+    } else {
+        *u_y = this->sigma_1(x, y);
+        *u_x = x / y * *u_y;
+    }
+}
+
 cv::Mat InverseDistortion::inverse_distortion(cv::Mat img) {
     Image dst(img);
 
@@ -49,20 +64,16 @@ cv::Mat InverseDistortion::inverse_distortion(cv::Mat img) {
         float y = (static_cast<float>(i) - offset_y) / offset_y;
         for (int j = 0; j < img.cols; j++) {
             float x = (static_cast<float>(j) - offset_x) / offset_x;
-            float d_y = this->sigma_1(x, y);
-            float d_x = x / y * d_y;
+            float d_y, d_x;
+            this->inverse_distortion(x, y, &d_x, &d_y);
 
             int d_i = static_cast<int>(d_y * offset_y)
                     + static_cast<int>(offset_y);
             int d_j = static_cast<int>(d_x * offset_x)
                     + static_cast<int>(offset_x);
 
-            if (d_i > -1 && d_j > -1 && d_j < img.cols && d_i < img.rows) {
-                cv::Vec3b distortion_pixel = get_pixel(d_j, d_i, img);
-                dst.set_pixel(j, i, distortion_pixel);
-            } else {
-                dst.set_pixel(j, i, cv::Vec3b(255, 255, 255));
-            }
+            cv::Vec3b distortion_pixel = get_pixel(d_j, d_i, img);
+            dst.set_pixel(j, i, distortion_pixel);
         }
     }
     // dst.resize(1.0 / max_distortion_x, 1.0 / max_distortion_y);
@@ -90,16 +101,7 @@ void InverseDistortion::plot(float spacing) {
             float d_y = mdl.distortion_y(col, row);
 
             float u_y, u_x;
-            if (fabs(d_y) <= FLT_EPSILON && fabs(d_x) <= FLT_EPSILON) {
-                u_x = 0.0;
-                u_y = 0.0;
-            } else if (fabs(d_y) <= FLT_EPSILON) {
-                u_x = this->sigma_1(d_y, d_x);
-                u_y = 0.0;
-            } else {
-                u_y = this->sigma_1(d_x, d_y);
-                u_x = d_x / d_y * u_y;
-            }
+            this->inverse_distortion(d_x, d_y, &u_x, &u_y);
             // std::cout << "u_x = " << u_x << ", u_y = " << u_y << std::endl;
             x.push_back(d_x);
             y.push_back(d_y);
