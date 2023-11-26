@@ -34,10 +34,12 @@ class DistortionModel {
 
     ~DistortionModel(void) {}
 
+    bool is_zero(float a);
+    bool is_equal(float a, float b, float max_rel_diff);
     float distortion_x(float x, float y);
     float distortion_y(float x, float y);
-    void plot_distortion(float spacing);
     cv::Mat distortion(cv::Mat img);
+    void plot(float spacing);
 };
 
 #endif  // DISTORTION_MODEL_HPP_

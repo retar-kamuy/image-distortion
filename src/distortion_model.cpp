@@ -1,34 +1,51 @@
 #include "image.hpp"
 #include "distortion_model.hpp"
 
+bool DistortionModel::is_equal(
+    float a, float b, float max_rel_diff = FLT_EPSILON
+) {
+    // Calculate the difference.
+    float diff = fabs(a - b);
+    a = fabs(a);
+    b = fabs(b);
+    // Find the largest
+    float largest = (b > a) ? b : a;
+
+    if (diff <= largest * max_rel_diff)
+        return true;
+    return false;
+}
+
 float DistortionModel::distortion_x(float x, float y) {
-    float pow_x = std::pow(x, 2.0);
-    float pow_y = std::pow(y, 2.0);
+    float pow_x = std::pow(x, 2);
+    float pow_y = std::pow(y, 2);
     float pow_r = pow_x + pow_y;
 
-    return this->p_2 * (3.0 * pow_x + pow_y)
+    float d_x = this->p_2 * (3.0 * pow_x + pow_y)
         + x * (this->k_2 * pow_r * pow_r
         + this->k_1 * pow_r + 1.0)
         + 2.0 * this->p_1 * x * y;
+    return d_x;
 }
 
 float DistortionModel::distortion_y(float x, float y) {
-    float pow_x = std::pow(x, 2.0);
-    float pow_y = std::pow(y, 2.0);
+    float pow_x = std::pow(x, 2);
+    float pow_y = std::pow(y, 2);
     float pow_r = pow_x + pow_y;
 
-    return this->p_1 * (pow_x + 3.0 * pow_y)
+    float d_y = this->p_1 * (pow_x + 3.0 * pow_y)
         + y * (this->k_2 * pow_r * pow_r
         + this->k_1 * pow_r + 1.0)
         + 2.0 * this->p_2 * x * y;
+    return d_y;
 }
 
 cv::Mat DistortionModel::distortion(cv::Mat img) {
-    Image resized_img(img);
+    // Image resized_img(img);
     Image dst(img);
 
-    double max_distortion_x = this->distortion_x(1.0, 1.0);
-    double max_distortion_y = this->distortion_y(1.0, 1.0);
+    // double max_distortion_x = this->distortion_x(1.0, 1.0);
+    // double max_distortion_y = this->distortion_y(1.0, 1.0);
     // resized_img.resize(max_distortion_x, max_distortion_y);
 
     float offset_x = static_cast<float>(img.cols) / 2.0;
@@ -58,7 +75,7 @@ cv::Mat DistortionModel::distortion(cv::Mat img) {
     return dst.get_img();
 }
 
-void DistortionModel::plot_distortion(float spacing) {
+void DistortionModel::plot(float spacing) {
     int plot_number = static_cast<int>(2.0 / spacing) + 2;
 
     std::vector<float> x, y;

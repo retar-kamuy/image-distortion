@@ -9,6 +9,7 @@ add_executable(image-distortion
     src/main.cpp
     src/image.cpp
     src/distortion_model.cpp
+    src/inverse_distortion.cpp
 )
 
 target_compile_features(image-distortion
