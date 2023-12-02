@@ -30,5 +30,14 @@ int main(void) {
 
     imwrite("Lenna_output.png", dst);
 
+    DistortionModel mdl(k_1, k_2, p_1, p_2);
+
+    cv::Mat dst_2 = mdl.distortion(dst);
+
+    imwrite("Lenna_output_2.png", dst_2);
+
+    int filter[512 * 512];
+    mdl.get_distortion_filter(dst.cols, dst.rows, filter);
+
     return 0;
 }

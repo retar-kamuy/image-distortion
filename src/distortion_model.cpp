@@ -67,12 +67,39 @@ cv::Mat DistortionModel::distortion(cv::Mat img) {
                 cv::Vec3b distortion_pixel = get_pixel(d_j, d_i, img);
                 dst.set_pixel(j, i, distortion_pixel);
             } else {
-                dst.set_pixel(j, i, cv::Vec3b(255, 255, 255));
+                dst.set_pixel(j, i, cv::Vec3b(0, 0, 0));
             }
         }
     }
     // dst.resize(1.0 / max_distortion_x, 1.0 / max_distortion_y);
     return dst.get_img();
+}
+
+void DistortionModel::get_distortion_filter(
+    int width, int height, int *filter
+) {
+    float offset_x = static_cast<float>(width) / 2.0;
+    float offset_y = static_cast<float>(height) / 2.0;
+
+    for (int i = 0; i < height; i++) {
+        float y = (static_cast<float>(i) - offset_y) / offset_y;
+        for (int j = 0; j < width; j++) {
+            float x = (static_cast<float>(j) - offset_x) / offset_x;
+            float d_x = this->distortion_x(x, y);
+            float d_y = this->distortion_y(x, y);
+
+            int d_i = static_cast<int>(d_y * offset_y)
+                    + static_cast<int>(offset_y);
+            int d_j = static_cast<int>(d_x * offset_x)
+                    + static_cast<int>(offset_x);
+
+            if (d_i > -1 && d_j > -1 && d_j < width && d_i < height) {
+                filter[i * width + j] = d_i * width + d_j;
+            } else {
+                filter[i * width + j] = height * width;
+            }
+        }
+    }
 }
 
 void DistortionModel::plot(float spacing) {

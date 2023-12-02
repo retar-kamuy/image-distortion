@@ -39,6 +39,7 @@ class DistortionModel {
     float distortion_x(float x, float y);
     float distortion_y(float x, float y);
     cv::Mat distortion(cv::Mat img);
+    void get_distortion_filter(int width, int height, int *filter);
     void plot(float spacing);
 };
 
