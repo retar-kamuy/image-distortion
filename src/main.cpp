@@ -36,8 +36,12 @@ int main(void) {
 
     imwrite("Lenna_output_2.png", dst_2);
 
-    int filter[512 * 512];
-    mdl.get_distortion_filter(dst.cols, dst.rows, filter);
+    cv::Mat dst_3 = mdl.distortion_sparse(dst, 4);
+
+    imwrite("Lenna_output_3.png", dst_3);
+
+    // int filter[512 * 512];
+    // mdl.get_distortion_filter(dst.cols, dst.rows, filter);
 
     return 0;
 }
